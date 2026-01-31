@@ -3,6 +3,8 @@ const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
 const BorrowLog = sequelize.define('BorrowLog', {
+    
+    
     userId: {
         type: DataTypes.INTEGER,
         allowNull: false

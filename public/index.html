@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #0d6efd;
+            --bg-light: #f3f4f6;
+            --text-dark: #1f2937;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-dark); }
+        .navbar { background-color: var(--primary-blue) !important; padding: 0.8rem 1rem; }
+        .navbar-brand { font-weight: 700; font-size: 1.2rem; }
+        .nav-link { color: rgba(255,255,255,0.8) !important; font-weight: 500; }
+        .nav-link.active, .nav-link:hover { color: white !important; font-weight: 700; }
+        .card { border: none; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); transition: transform 0.2s; background: white; }
+        .book-card:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .badge-stock { padding: 5px 10px; border-radius: 6px; font-weight: 500; }
+        .view-section { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .view-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .book-detail-header { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .big-icon { font-size: 4rem; color: var(--primary-blue); opacity: 0.2; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="#" onclick="showSection('dashboard')"><i class="fas fa-book me-2"></i>Library System</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"><span class="navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('dashboard')"><i class="fas fa-home me-1"></i> Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showSection('books')"><i class="fas fa-book-open me-1"></i> Books</a></li>
+                </ul>
+                <div class="dropdown">
+                    <button class="btn btn-light btn-sm dropdown-toggle fw-bold text-primary" type="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-circle me-1"></i> <span id="currentRoleDisplay">GUEST</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#" onclick="changeRole('user')">Login as User</a></li>
+                        <li><a class="dropdown-item" href="#" onclick="changeRole('admin')">Login as Admin</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" href="#" onclick="changeRole('guest')">Logout (Guest)</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-4">
+        
+        <section id="view-dashboard" class="view-section active">
+            <div class="text-center py-5">
+                <i class="fas fa-book-reader text-primary mb-3" style="font-size: 3rem;"></i>
+                <h2 class="fw-bold mb-2">Library Management System</h2>
+                <p class="text-muted">Manage and borrow books with geolocation tracking</p>
+            </div>
+
+            <div class="alert alert-success border-0 shadow-sm d-flex align-items-center" role="alert">
+                <i class="fas fa-user-check me-2 fs-4"></i>
+                <div>You are logged in as <strong id="dashboard-role-text">GUEST</strong><br><small>User ID: <span id="dashboard-user-id">-</span></small></div>
+            </div>
+
+            <div class="row g-4 mt-2 justify-content-center">
+                <div class="col-md-4" id="card-manage">
+                    <div class="card h-100 p-4 text-center">
+                        <div class="mb-3"><i class="fas fa-book fs-2 text-primary"></i></div>
+                        <h5>Book Management</h5>
+                        <p class="text-muted small">Browse collection of books.</p>
+                        <button class="btn btn-outline-primary btn-sm mt-auto" onclick="showSection('books')">Browse Books</button>
+                    </div>
+                </div>
+                
+                <div class="col-md-4" id="card-geo">
+                    <div class="card h-100 p-4 text-center">
+                        <div class="mb-3"><i class="fas fa-map-marker-alt fs-2 text-success"></i></div>
+                        <h5>Geolocation Tracking</h5>
+                        <p class="text-muted small">Track borrowing locations.</p>
+                        <button class="btn btn-outline-success btn-sm mt-auto" onclick="showSection('books')">Borrow Book</button>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 p-4 text-center">
+                        <div class="mb-3"><i class="fas fa-shield-alt fs-2 text-warning"></i></div>
+                        <h5>Role Access</h5>
+                        <p class="text-muted small">Switch roles for demo purposes.</p>
+                        <div class="d-grid gap-2 d-md-block">
+                            <button class="btn btn-sm btn-warning" onclick="changeRole('admin')">Admin</button>
+                            <button class="btn btn-sm btn-info text-white" onclick="changeRole('user')">User</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-books" class="view-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="fw-bold mb-1"><i class="fas fa-book me-2"></i>Available Books</h4>
+                <div class="d-flex gap-2">
+                    <button id="btn-add-new" class="btn btn-primary btn-sm d-none" onclick="showAddForm()"><i class="fas fa-plus-circle me-1"></i> Add New Book</button>
+                    <button class="btn btn-light btn-sm border" onclick="fetchBooks()"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </div>
+            
+            <div class="row g-3 mb-4 text-center">
+                <div class="col-6 col-md-3"><div class="p-3 bg-white rounded shadow-sm"><h3 class="fw-bold text-primary mb-0" id="stat-total">0</h3><small class="text-muted">Total Books</small></div></div>
+                <div class="col-6 col-md-3"><div class="p-3 bg-white rounded shadow-sm"><h3 class="fw-bold text-success mb-0" id="stat-available">0</h3><small class="text-muted">Available</small></div></div>
+                <div class="col-6 col-md-3"><div class="p-3 bg-white rounded shadow-sm"><h3 class="fw-bold text-danger mb-0" id="stat-out">0</h3><small class="text-muted">Out of Stock</small></div></div>
+                <div class="col-6 col-md-3"><div class="p-3 bg-white rounded shadow-sm"><h3 class="fw-bold text-warning mb-0" id="stat-copies">0</h3><small class="text-muted">Total Copies</small></div></div>
+            </div>
+
+            <div id="books-grid" class="row g-4"></div>
+        </section>
+
+        <section id="view-detail" class="view-section">
+            <div class="book-detail-header mb-4">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <a href="#" onclick="showSection('books')" class="text-decoration-none text-muted mb-2 d-inline-block"><i class="fas fa-arrow-left me-1"></i> Back to Books</a>
+                        <h2 class="fw-bold mb-1" id="detail-title">Title</h2>
+                        <p class="text-muted fs-5 mb-3"><span id="detail-author">Author</span></p>
+                        <span class="badge bg-success fs-6 mb-3" id="detail-badge">Available</span>
+                    </div>
+                    <div class="col-md-4 text-end d-none d-md-block"><i class="fas fa-book-open big-icon"></i></div>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-8">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3">Information</h5>
+                        <table class="table table-borderless">
+                            <tr><td class="text-muted w-25">ID</td><td class="fw-bold" id="detail-id">-</td></tr>
+                            <tr><td class="text-muted">Stock</td><td class="fw-bold" id="detail-stock">-</td></tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3">Actions</h5>
+                        <div id="detail-admin-actions" class="d-none d-grid gap-2">
+                            <button class="btn btn-warning" id="btn-edit-detail">Edit</button>
+                            <button class="btn btn-outline-danger" id="btn-delete-detail">Delete</button>
+                        </div>
+                        <div id="detail-user-actions" class="d-none">
+                            <button class="btn btn-success w-100 py-2" id="btn-borrow-detail">Borrow This Book</button>
+                        </div>
+                        <div id="detail-guest-actions" class="text-center text-muted">
+                            <div class="alert alert-warning small">Please <strong>Login as User</strong> to borrow books.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-form" class="view-section">
+            <div class="row justify-content-center">
+                <div class="col-md-8 col-lg-6">
+                    <div class="card p-4 shadow-sm border-top border-4 border-primary">
+                        <h4 class="fw-bold mb-4" id="form-title">Add Book</h4>
+                        <form id="bookForm">
+                            <input type="hidden" id="form-book-id">
+                            <div class="mb-3"><label class="fw-bold small">TITLE</label><input type="text" id="form-input-title" class="form-control" required></div>
+                            <div class="mb-3"><label class="fw-bold small">AUTHOR</label><input type="text" id="form-input-author" class="form-control" required></div>
+                            <div class="mb-3"><label class="fw-bold small">STOCK</label><input type="number" id="form-input-stock" class="form-control" required></div>
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-light" onclick="showSection('books')">Cancel</button>
+                                <button type="submit" class="btn btn-primary px-4">Save</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-borrow" class="view-section">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card shadow p-4">
+                        <h4 class="mb-3 text-center text-success"><i class="fas fa-map-marked-alt me-2"></i>Borrow Book</h4>
+                        <form id="borrowForm">
+                            <input type="hidden" id="borrow-book-id">
+                            <div class="alert alert-info py-2"><small>Book ID: <span id="borrow-book-id-display"></span> | User ID: 850</small></div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-6"><label class="small fw-bold">LAT</label><input type="text" id="borrow-lat" class="form-control" readonly></div>
+                                <div class="col-6"><label class="small fw-bold">LONG</label><input type="text" id="borrow-long" class="form-control" readonly></div>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary w-100 mb-3" onclick="detectLocation()">Auto Detect Location</button>
+                            <button type="submit" class="btn btn-success w-100 fw-bold">Confirm Borrow</button>
+                            <button type="button" class="btn btn-light w-100 mt-2" onclick="showSection('books')">Cancel</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -11,7 +11,11 @@ const PORT = 3000;
 
 // Middleware dasar
 app.use(cors());
-app.use(express.json()); // Untuk membaca body JSON
+app.use(express.json());
+app.use(express.static('public'));
+
+Book.hasMany(BorrowLog, { foreignKey: 'bookId' });
+BorrowLog.belongsTo(Book, { foreignKey: 'bookId' });
 
 // Routes
 app.use('/api', apiRoutes);
